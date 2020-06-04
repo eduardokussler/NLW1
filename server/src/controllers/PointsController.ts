@@ -3,81 +3,81 @@ import knex from '../database/connection';
 
 
 class PointsController {
-	async create(request: Request, response: Response) {    
-		const { name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
+  async create(request: Request, response: Response) {    
+    const { name, email, whatsapp, latitude, longitude, city, uf, items } = request.body;
 
-		const trx = await knex.transaction();
+    const trx = await knex.transaction();
 
-		const point = {
-			image: 'https://images.unsplash.com/photo-1556767576-5ec41e3239ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
-			name,
-			email,
-			whatsapp,
-			latitude,
-			longitude,
-			city,
-			uf
-		};
+    const point = {
+      image: 'https://images.unsplash.com/photo-1556767576-5ec41e3239ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
+      name,
+      email,
+      whatsapp,
+      latitude,
+      longitude,
+      city,
+      uf
+    };
 
-		const insertedIds = await trx('points').insert(point);
+    const insertedIds = await trx('points').insert(point);
 
-		const point_id = insertedIds[0];
+    const point_id = insertedIds[0];
 
-		const pointItems = items.map((item_id: number) => {
-			return {
-				item_id,
-				point_id,
-			};
-		});
+    const pointItems = items.map((item_id: number) => {
+      return {
+        item_id,
+        point_id,
+      };
+    });
 
-		await trx('point_items').insert(pointItems);
-		await trx.commit();
-		if (trx.isCompleted()){
-			return response.json({
-				id: point_id,
-				...point,
-			});
-		} else {
-			return response.status(500).json({ error: 'Transaction could not be completed'});
-		}
-	}
+    await trx('point_items').insert(pointItems);
+    await trx.commit();
+    if (trx.isCompleted()){
+      return response.json({
+        id: point_id,
+        ...point,
+      });
+    } else {
+      return response.status(500).json({ error: 'Transaction could not be completed'});
+    }
+  }
 
-	async show(request: Request, response: Response) {
-		const { id } = request.params;
+  async show(request: Request, response: Response) {
+    const { id } = request.params;
     
-		const point = await knex('points').where('id', id).first();
+    const point = await knex('points').where('id', id).first();
     
-		if(!point){
-			return response.status(400).json({ message: 'Point not found!' });
-		}
+    if(!point){
+      return response.status(400).json({ message: 'Point not found!' });
+    }
 
-		const items = await knex('items')
-			.join('point_items', 'items.id', '=', 'point_items.item_id')
-			.where('point_items.point_id', id)
-			.select('title');
+    const items = await knex('items')
+      .join('point_items', 'items.id', '=', 'point_items.item_id')
+      .where('point_items.point_id', id)
+      .select('title');
 
-		return response.json({ point, items });
-	}
+    return response.json({ point, items });
+  }
 
-	async index(request: Request, response: Response) {
-		const { city, uf, items } = request.query;
-		const parsedItems = String(items).split(',')
-			.map(item => 
-				Number(item.trim())
-			);
+  async index(request: Request, response: Response) {
+    const { city, uf, items } = request.query;
+    const parsedItems = String(items).split(',')
+      .map(item => 
+        Number(item.trim())
+      );
 
-		const points = await knex('points')
-			.join('point_items', 'points.id', '=', 'point_items.point_id')
-		// Pelo menos um item id no parsedItems
-			.whereIn('point_items.item_id', parsedItems)
-			.where('city', String(city))
-			.where('uf', String(uf))
-			.distinct()
-			.select('points.*');
+    const points = await knex('points')
+      .join('point_items', 'points.id', '=', 'point_items.point_id')
+    // Pelo menos um item id no parsedItems
+      .whereIn('point_items.item_id', parsedItems)
+      .where('city', String(city))
+      .where('uf', String(uf))
+      .distinct()
+      .select('points.*');
 
 
-		return response.json(points);
-	}
+    return response.json(points);
+  }
 }
 
 export default PointsController;
