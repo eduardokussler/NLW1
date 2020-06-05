@@ -9,7 +9,7 @@ import api from '../../services/api';
 import './styles.css';
 
 import logo from '../../assets/logo.svg';
-import { tileLayer } from 'leaflet';
+
 
 interface Item {
   id: number,
