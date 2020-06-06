@@ -10,6 +10,7 @@ interface Data {
   point: {
     id: number;
     image: string;
+    image_url: string;
     name: string;
     email: string;
     whatsapp: string;
@@ -73,7 +74,7 @@ const Detail: React.FC = () => {
         </TouchableOpacity>
 
         <Image style={styles.pointImage} source={{
-          uri: data.point.image
+          uri: data.point.image_url
         }}></Image>
 
         <Text style={styles.pointName}>{data.point.name}</Text>

@@ -8,7 +8,7 @@ import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import api from '../../services/api';
 
-interface Item{
+interface Item {
   id: number;
   title: string;
   image_url: string;
@@ -17,6 +17,7 @@ interface Item{
 interface Point {
   id: number;
   image: string;
+  image_url: string;
   name: string;
   email: string;
   whatsapp: string;
@@ -41,17 +42,7 @@ const Points: React.FC = () => {
   const [ selectedItems, setSelectedItems ] = useState<number[]>([]);
   const [ initialPosition, setInitialPosition ] = useState<[number, number]>([0, 0]);
   const [ points, setPoints ] = useState<Point[]>([
-    {
-      id: 0,
-      image: '',
-      name: '',
-      email: '',
-      whatsapp: '',
-      latitude: 0,
-      longitude: 0,
-      city: '',
-      uf: '',
-    }
+    {} as Point
   ]);
 
   useEffect(() => {
@@ -143,7 +134,7 @@ const Points: React.FC = () => {
                     }}>
                     <View style={styles.mapMarkerContainer}>
                       <Image style={styles.mapMarkerImage}
-                        source={{uri: point.image}}></Image>
+                        source={{uri: point.image_url}}></Image>
                       <Text style={styles.mapMarkerTitle}>Languiru</Text>
                     </View>
                   </Marker>
